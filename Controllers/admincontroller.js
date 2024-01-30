@@ -101,18 +101,18 @@ exports.allotBook = async (req, res) => {
     }
 
     const book = await Book.findOne({ Bookname });
-
+    console.log(book);
     if (!book) {
       return res.status(404).json({
         status: "Fail",
         message: "Book not found",
       });
     }
-    const bookId = new mongoose.Types.ObjectId(book.id);
-
+    const bookId = new mongoose.Types.ObjectId(book._id);
+    console.log(bookId);
     const entry = await Data.create({
       email: user.email,
-      booksAlloted: [bookId],
+      BooksAlloted: [bookId],
       Date_of_Issue: Date.now(),
     });
 
