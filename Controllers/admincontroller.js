@@ -101,7 +101,7 @@ exports.allotBook = async (req, res) => {
     }
 
     const book = await Book.findOne({ Bookname });
-    console.log(book);
+
     if (!book) {
       return res.status(404).json({
         status: "Fail",
@@ -110,9 +110,9 @@ exports.allotBook = async (req, res) => {
     }
     const bookId = new mongoose.Types.ObjectId(book._id);
     console.log(bookId);
-    const entry = await Data.create({
+    const entry = await Data.updateOne({
       email: user.email,
-      BooksAlloted: [bookId],
+      $push: { BooksAlloted: { $each: bookId } },
       Date_of_Issue: Date.now(),
     });
 
