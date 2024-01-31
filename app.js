@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+const { AppError, errorHandler } = require("./ErrrorHandlers/AppError");
 dotenv.config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -6,7 +7,7 @@ const userRoutes = require("./Routes/userRoutes");
 const seedAdminMiddleware = require("./Controllers/admincontroller");
 const admincontroller = require("./Controllers/admincontroller");
 const adminRoutes = require("./Routes/adminRoutes");
-
+const undefinedRoutes = require("./Middlewares/ErrorHandlingMiddleware");
 const secretkey = "thisismysecretkey";
 const expires = 90;
 
@@ -27,6 +28,11 @@ mongoose
   });
 
 app.use("/", userRoutes, adminRoutes);
+app.use(errorHandler);
+
+app.use(undefinedRoutes);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+module.exports = app;

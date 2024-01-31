@@ -7,79 +7,71 @@ const Book = require("../Modals/booksModal");
 const Admin = require("../Modals/AdminModal");
 const User = require("../Modals/userModal");
 
-exports.signup = async (req, res) => {
-  try {
-    if (req.body.password != req.body.confirmPassword) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Password and confirmPassword does not match ",
-      });
-    }
-    const user = await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      confirmPassword: req.body.confirmPassword,
-    });
-
-    return res.status(200).json({
-      status: "success",
-      message: "User Created",
-      data: user,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "Fail",
-      message: err.message,
-    });
-  }
+const catchAsync = (fn) => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
 };
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Please enter valid credentials, both Email and Password",
-      });
-    }
-
-    const admin = await Admin.findOne({ email });
-
-    if (admin && (await admin.comparepassword(password, admin.password))) {
-      const token = jwt.sign({ id: admin.id }, secretkey);
-      return res.status(200).json({
-        status: "success",
-        message: "Logged in successfully as Admin",
-        token,
-      });
-    }
-
-    const user = await User.findOne({ email });
-    if (user && (await user.comparepassword(password, user.password))) {
-      const token = jwt.sign({ id: user.id }, secretkey);
-      return res.status(200).json({
-        status: "success",
-        message: "Logged in successfully as User",
-        token,
-      });
-    }
-
-    return res.status(400).json({
-      status: "Fail",
-      message: "Invalid Email or Password",
+exports.signup = catchAsync(async (req, res, next) => {
+  if (req.body.password != req.body.confirmPassword) {
+    return res.status(401).json({
+      status: "fail",
+      message: "Password and confirmPassword does not match ",
     });
-  } catch (err) {
+  }
+  const user = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    confirmPassword: req.body.confirmPassword,
+  });
+
+  return res.status(200).json({
+    status: "success",
+    message: "User Created",
+    data: user,
+  });
+});
+
+exports.login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
     return res.status(400).json({
       status: "fail",
-      message: err.message,
+      message: "Please enter valid credentials, both Email and Password",
     });
   }
-};
 
-exports.protect = async (req, res, next) => {
+  const admin = await Admin.findOne({ email });
+
+  if (admin && (await admin.comparepassword(password, admin.password))) {
+    const token = jwt.sign({ id: admin.id }, secretkey);
+    return res.status(200).json({
+      status: "success",
+      message: "Logged in successfully as Admin",
+      token,
+    });
+  }
+
+  const user = await User.findOne({ email });
+  if (user && (await user.comparepassword(password, user.password))) {
+    const token = jwt.sign({ id: user.id }, secretkey);
+    return res.status(200).json({
+      status: "success",
+      message: "Logged in successfully as User",
+      token,
+    });
+  }
+
+  return res.status(400).json({
+    status: "Fail",
+    message: "Invalid Email or Password",
+  });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
   const data = req.header("Authorization");
   if (!data) {
     return res.status(401).json({
@@ -118,9 +110,9 @@ exports.protect = async (req, res, next) => {
       message: "You are not a Valid User/Admin, Please register first ",
     });
   }
-};
+});
 
-exports.CheckUser = async (req, res, next) => {
+exports.CheckUser = catchAsync(async (req, res, next) => {
   try {
     if (req.user.roles === "user") {
       next();
@@ -136,15 +128,15 @@ exports.CheckUser = async (req, res, next) => {
       Error: err.message,
     });
   }
-};
+});
 
-exports.adminMiddleware = async (req, res, next) => {
+exports.adminMiddleware = catchAsync(async (req, res, next) => {
   if (req.user.role !== "user") {
     return next();
   }
-};
+});
 
-exports.getbooks = async (req, res) => {
+exports.getbooks = catchAsync(async (req, res) => {
   try {
     const book = await Book.find();
 
@@ -159,4 +151,4 @@ exports.getbooks = async (req, res) => {
       error: err.message,
     });
   }
-};
+});
