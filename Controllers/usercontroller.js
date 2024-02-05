@@ -137,18 +137,20 @@ exports.adminMiddleware = catchAsync(async (req, res, next) => {
 });
 
 exports.getbooks = catchAsync(async (req, res) => {
-  try {
-    const book = await Book.find();
+  const book = await Book.find();
 
-    return res.status(200).json({
-      status: "success",
-      message: "Here are all the book in the library",
-      books: book,
-    });
-  } catch (err) {
-    return res.status(400).json({
-      status: "fail",
-      error: err.message,
-    });
-  }
+  return res.status(200).json({
+    status: "success",
+    message: "Here are all the book in the library",
+    books: book,
+  });
+});
+exports.getmybook = catchAsync(async (req, res) => {
+  const myBooks = Book.findOne({ email });
+
+  return res.status(200).json({
+    status: "success",
+    email: myBooks.email,
+    MyBooks: myBooks,
+  });
 });

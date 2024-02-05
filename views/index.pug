@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Library System
+    link(rel='shortcut icon', href='#')
+    link(rel='stylesheet', href='/style.css')
+  
+    .container
+      h2 Sign Up
+      form(action='/signup', method='POST')
+        label(for='username') Username:
+        input(type='text', id='username', name='username', required)
+        
+        label(for='email') Email:
+        input(type='email', id='email', name='email', required)
+
+        label(for='password') Password:
+        input(type='password', id='password', name='password', required)
+
+        label(for='confirmPassword') Confirm Password:
+        input(type='password', id='confirmPassword', name='confirmPassword', required)
+
+        button(type='submit') Sign Up

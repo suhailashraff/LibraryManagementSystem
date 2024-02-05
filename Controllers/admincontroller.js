@@ -80,8 +80,10 @@ exports.allotBook = catchAsync(async (req, res, next) => {
   console.log(bookId);
   const entry = await Data.updateOne({
     email: user.email,
-
     Date_of_Issue: Date.now(),
+  });
+  const allottedBooks = Data.create({
+    BooksAlloted: [...BooksAlloted, ...bookId],
   });
 
   return res.status(201).json({

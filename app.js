@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+const path = require("path");
 const { AppError, errorHandler } = require("./ErrrorHandlers/AppError");
 dotenv.config();
 const express = require("express");
@@ -16,6 +17,16 @@ const port = 8000;
 admincontroller.seedAdminMiddleware();
 app.use(express.json());
 
+app.set("view engine", "pug");
+
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.static(path.join(__dirname, "static")));
+
+console.log(path.join(__dirname, "static"));
+const rootDirectory = path.resolve(__dirname);
+
+console.log("Root Directory:", rootDirectory);
 mongoose
   .connect(
     "mongodb+srv://suhailashraf:suhail@cluster0.eseq5cy.mongodb.net/Library-System?retryWrites=true&w=majority"
@@ -27,6 +38,9 @@ mongoose
     console.error("Database connection failed", err);
   });
 
+app.get("/homepage", (req, res) => {
+  res.status(200).render("index");
+});
 app.use("/", userRoutes, adminRoutes);
 app.use(errorHandler);
 

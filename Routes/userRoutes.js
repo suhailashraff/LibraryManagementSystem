@@ -12,5 +12,11 @@ app
     usercontroller.CheckUser,
     usercontroller.getbooks
   );
-
+app
+  .route("getmybooks")
+  .get(
+    usercontroller.protect,
+    usercontroller.CheckUser,
+    usercontroller.getmybook
+  );
 module.exports = app;
